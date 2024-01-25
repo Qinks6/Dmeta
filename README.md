@@ -1311,7 +1311,7 @@ Dmeta-embedding 模型在 [MTEB 中文榜单](https://huggingface.co/spaces/mteb
 
 您如果在使用过程中，遇到任何问题，欢迎前往[讨论区](https://huggingface.co/DMetaSoul/Dmeta-embedding/discussions)建言献策。
 
-您也可以联系我们：赵中昊 <zhongh@dmetasoul.com>, 肖文斌 <xiaowenbin@dmetasoul.com>, 孙凯 <xiaowenbin@dmetasoul.com>
+您也可以联系我们：赵中昊 <zhongh@dmetasoul.com>, 肖文斌 <xiaowenbin@dmetasoul.com>, 孙凯 <sunkai@dmetasoul.com>
 
 ## License
 
