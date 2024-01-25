@@ -1071,7 +1071,7 @@ model-index:
     <p>
         <a href=#usage>用法</a>  |
         <a href="#evaluation">评测</a> |
-        <a href=#FAQ>FAQ</a> |
+        <a href=#faq>FAQ</a> |
         <a href="#contact">联系</a> |
         <a href="#license">版权（免费商用）</a> 
     <p>
