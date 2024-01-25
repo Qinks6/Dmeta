@@ -1061,31 +1061,258 @@ model-index:
 
 ---
 
-# Dmeta-embedding
+<div align="center">
+<img src="logo.png" alt="icon" width="100px"/>
+</div>
 
+<h1 align="center">Dmeta-embedding</h1>
 
-<!--- Describe your model here -->
+<h4 align="center">
+    <p>
+        <a href=#usage>用法</a>  |
+        <a href="#evaluation">评测</a> |
+        <a href=#FAQ>FAQ</a> |
+        <a href="#contact">联系</a> |
+        <a href="#license">版权（免费商用）</a> 
+    <p>
+</h4>
 
-## Usage (Sentence-Transformers)
+Dmeta-embedding 是一款跨领域、跨任务、开箱即用的中文 Embedding 模型，适用于搜索、问答、智能客服、LLM+RAG 等各种业务场景。
 
-Using this model becomes easy when you have [sentence-transformers](https://www.SBERT.net) installed:
+优势特点如下：
+
+- 多任务、场景泛化性能优异，目前已取得 [MTEB](https://huggingface.co/spaces/mteb/leaderboard) 中文榜单第二成绩（2024.01.25）
+- 模型参数大小仅 400MB，对比参数量超过 GB 级模型，可以极大降低推理成本
+- 支持上下文窗口长度达到 1024，对于长文本检索、RAG 等场景更适配
+
+## 用法
+
+目前模型支持通过 [Sentence-Transformers](#sentence-transformers), [Langchain](#langchain), [Huggingface Transformers](#huggingface-transformers) 等主流框架进行推理，具体用法参考各个框架的示例。
+
+### Sentence-Transformers
+
+Dmeta-embedding 模型支持通过 [sentence-transformers](https://www.SBERT.net) 来加载推理：
 
 ```
 pip install -U sentence-transformers
 ```
 
-Then you can use the model like this:
-
 ```python
 from sentence_transformers import SentenceTransformer
-sentences = ["This is an example sentence", "Each sentence is converted"]
 
-model = SentenceTransformer('{MODEL_NAME}')
-embeddings = model.encode(sentences)
-print(embeddings)
+texts1 = ["胡子长得太快怎么办？", "在香港哪里买手表好"]
+texts2 = ["胡子长得快怎么办？", "怎样使胡子不浓密！", "香港买手表哪里好", "在杭州手机到哪里买"]
+
+model = SentenceTransformer('DMetaSoul/Dmeta-embedding')
+embs1 = model.encode(texts1, normalize_embeddings=True)
+embs2 = model.encode(texts2, normalize_embeddings=True)
+
+# 计算两两相似度
+similarity = embs1 @ embs2.T
+print(similarity)
+
+# 获取 texts1[i] 对应的最相似 texts2[j]
+for i in range(len(texts1)):
+    scores = []
+    for j in range(len(texts2)):
+        scores.append([texts2[j], similarity[i][j]])
+    scores = sorted(scores, key=lambda x:x[1], reverse=True)
+
+    print(f"查询文本：{texts1[i]}")
+    for text2, score in scores:
+        print(f"相似文本：{text2}，打分：{score}")
+    print()
 ```
 
+示例输出如下：
 
-## Citing & Authors
+```
+查询文本：胡子长得太快怎么办？
+相似文本：胡子长得快怎么办？，打分：0.9535336494445801
+相似文本：怎样使胡子不浓密！，打分：0.6776421070098877
+相似文本：香港买手表哪里好，打分：0.2297907918691635
+相似文本：在杭州手机到哪里买，打分：0.11386542022228241
 
-<!--- Describe where people can find more information -->
+查询文本：在香港哪里买手表好
+相似文本：香港买手表哪里好，打分：0.9843372106552124
+相似文本：在杭州手机到哪里买，打分：0.45211508870124817
+相似文本：胡子长得快怎么办？，打分：0.19985519349575043
+相似文本：怎样使胡子不浓密！，打分：0.18558596074581146
+```
+
+### Langchain
+
+Dmeta-embedding 模型支持通过 LLM 工具框架 [langchain](https://www.langchain.com/) 来加载推理：
+
+```
+pip install -U langchain
+```
+
+```python
+import torch
+import numpy as np
+from langchain.embeddings import HuggingFaceEmbeddings
+
+model_name = "DMetaSoul/Dmeta-embedding"
+model_kwargs = {'device': 'cuda' if torch.cuda.is_available() else 'cpu'}
+encode_kwargs = {'normalize_embeddings': True} # set True to compute cosine similarity
+
+model = HuggingFaceEmbeddings(
+    model_name=model_name,
+    model_kwargs=model_kwargs,
+    encode_kwargs=encode_kwargs,
+)
+
+texts1 = ["胡子长得太快怎么办？", "在香港哪里买手表好"]
+texts2 = ["胡子长得快怎么办？", "怎样使胡子不浓密！", "香港买手表哪里好", "在杭州手机到哪里买"]
+
+embs1 = model.embed_documents(texts1)
+embs2 = model.embed_documents(texts2)
+embs1, embs2 = np.array(embs1), np.array(embs2)
+
+# 计算两两相似度
+similarity = embs1 @ embs2.T
+print(similarity)
+
+# 获取 texts1[i] 对应的最相似 texts2[j]
+for i in range(len(texts1)):
+    scores = []
+    for j in range(len(texts2)):
+        scores.append([texts2[j], similarity[i][j]])
+    scores = sorted(scores, key=lambda x:x[1], reverse=True)
+
+    print(f"查询文本：{texts1[i]}")
+    for text2, score in scores:
+        print(f"相似文本：{text2}，打分：{score}")
+    print()
+```
+
+### HuggingFace Transformers
+
+Dmeta-embedding 模型支持通过 [HuggingFace Transformers](https://huggingface.co/docs/transformers/index) 框架来加载推理：
+
+```
+pip install -U transformers
+```
+
+```python
+import torch
+from transformers import AutoTokenizer, AutoModel
+
+
+def mean_pooling(model_output, attention_mask):
+    token_embeddings = model_output[0] #First element of model_output contains all token embeddings
+    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
+
+def cls_pooling(model_output):
+    return model_output[0][:, 0]
+
+
+texts1 = ["胡子长得太快怎么办？", "在香港哪里买手表好"]
+texts2 = ["胡子长得快怎么办？", "怎样使胡子不浓密！", "香港买手表哪里好", "在杭州手机到哪里买"]
+
+tokenizer = AutoTokenizer.from_pretrained('DMetaSoul/Dmeta-embedding')
+model = AutoModel.from_pretrained('DMetaSoul/Dmeta-embedding')
+model.eval()
+
+with torch.no_grad():
+    inputs1 = tokenizer(texts1, padding=True, truncation=True, return_tensors='pt')
+    inputs2 = tokenizer(texts2, padding=True, truncation=True, return_tensors='pt')
+
+    model_output1 = model(**inputs1)
+    model_output2 = model(**inputs2)
+    embs1, embs2 = cls_pooling(model_output1), cls_pooling(model_output2)
+    embs1 = torch.nn.functional.normalize(embs1, p=2, dim=1).numpy()
+    embs2 = torch.nn.functional.normalize(embs2, p=2, dim=1).numpy()
+
+# 计算两两相似度
+similarity = embs1 @ embs2.T
+print(similarity)
+
+# 获取 texts1[i] 对应的最相似 texts2[j]
+for i in range(len(texts1)):
+    scores = []
+    for j in range(len(texts2)):
+        scores.append([texts2[j], similarity[i][j]])
+    scores = sorted(scores, key=lambda x:x[1], reverse=True)
+
+    print(f"查询文本：{texts1[i]}")
+    for text2, score in scores:
+        print(f"相似文本：{text2}，打分：{score}")
+    print()
+```
+
+## Evaluation
+
+Dmeta-embedding 模型在 [MTEB 中文榜单](https://huggingface.co/spaces/mteb/leaderboard)取得开源第一的成绩（2024.01.25，Baichuan 榜单第一、未开源），具体关于评测数据和代码可参考 MTEB 官方[仓库](https://github.com/embeddings-benchmark/mteb)。
+
+**MTEB Chinese**:   
+
+该[榜单数据集](https://github.com/FlagOpen/FlagEmbedding/blob/master/C_MTEB)由智源研究院团队（BAAI）收集整理，包含 6 个经典任务共计 35 个中文数据集，涵盖了分类、检索、排序、句对、STS 等任务，是目前 Embedding 模型全方位能力评测的全球权威榜单。
+
+| Model                                                                                                    | Vendor | Embedding dimension | Avg   | Retrieval | STS   | PairClassification | Classification | Reranking | Clustering |
+|:-------------------------------------------------------------------------------------------------------- | ------ |:-------------------:|:-----:|:---------:|:-----:|:------------------:|:--------------:|:---------:|:----------:|
+| [Dmeta-embedding](https://huggingface.co/DMetaSoul/Dmeta-embedding)                                      | 数元灵    | 1024                | 67.51 | 70.41     | 64.09 | 88.92              | 70             | 67.17     | 50.96      |
+| [gte-large-zh](https://huggingface.co/thenlper/gte-large-zh)                                             | 阿里达摩院  | 1024                | 66.72 | 72.49     | 57.82 | 84.41              | 71.34          | 67.4      | 53.07      |
+| [BAAI/bge-large-zh-v1.5](https://huggingface.co/BAAI/bge-large-zh-v1.5)                                  | 智源     | 1024                | 64.53 | 70.46     | 56.25 | 81.6               | 69.13          | 65.84     | 48.99      |
+| [BAAI/bge-base-zh-v1.5](https://huggingface.co/BAAI/bge-base-zh-v1.5)                                    | 智源     | 768                 | 63.13 | 69.49     | 53.72 | 79.75              | 68.07          | 65.39     | 47.53      |
+| [text-embedding-ada-002(OpenAI)](https://platform.openai.com/docs/guides/embeddings/what-are-embeddings) | OpenAI | 1536                | 53.02 | 52.0      | 43.35 | 69.56              | 64.31          | 54.28     | 45.68      |
+| [text2vec-base](https://huggingface.co/shibing624/text2vec-base-chinese)                                 | 个人     | 768                 | 47.63 | 38.79     | 43.41 | 67.41              | 62.19          | 49.45     | 37.66      |
+| [text2vec-large](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                              | 个人     | 1024                | 47.36 | 41.94     | 44.97 | 70.86              | 60.66          | 49.16     | 30.02      |
+
+## FAQ
+
+<details>
+  <summary>1. 为何模型多任务、场景泛化能力优异，可开箱即用适配诸多应用场景？</summary>
+
+<!-- ### 为何模型多任务、场景泛化能力优异，可开箱即用适配诸多应用场景？ -->
+
+简单来说，模型优异的泛化能力来自于预训练数据的广泛和多样，以及模型优化时面向多任务场景设计了不同优化目标。
+
+具体来说，技术要点有：
+
+1）首先是大规模弱标签对比学习。业界经验表明开箱即用的语言模型在 Embedding 相关任务上表现不佳，但由于监督数据标注、获取成本较高，因此大规模、高质量的弱标签学习成为一条可选技术路线。通过在互联网上论坛、新闻、问答社区、百科等半结构化数据中提取弱标签，并利用大模型进行低质过滤，得到 10 亿级别弱监督文本对数据。
+
+2）其次是高质量监督学习。我们收集整理了大规模开源标注的语句对数据集，包含百科、教育、金融、医疗、法律、新闻、学术等多个领域共计 3000 万句对样本。同时挖掘难负样本对，借助对比学习更好的进行模型优化。
+
+3）最后是检索任务针对性优化。考虑到搜索、问答以及 RAG 等场景是 Embedding 模型落地的重要应用阵地，为了增强模型跨领域、跨场景的效果性能，我们专门针对检索任务进行了模型优化，核心在于从问答、检索等数据中挖掘难负样本，借助稀疏和稠密检索等多种手段，构造百万级难负样本对数据集，显著提升了模型跨领域的检索性能。
+
+</details>
+
+<details>
+  <summary>2. 模型可以商用吗？</summary>
+
+<!-- ### 模型可以商用吗 -->
+
+我们的开源模型基于 Apache-2.0 协议，完全支持免费商用。
+
+</details>
+
+<details>
+  <summary>3. 如何复现 MTEB 评测结果？</summary>
+
+<!-- ### 如何复现 MTEB 评测结果？ -->
+
+我们在模型仓库中提供了脚本 mteb_eval.py，您可以直接运行此脚本来复现我们的评测结果。
+
+</details>
+
+<details>
+  <summary>4. 后续规划有哪些？</summary>
+
+<!-- ### 后续规划有哪些？ -->
+
+我们将不断致力于为社区提供效果优异、推理轻量、多场景开箱即用的 Embedding 模型，同时我们也会将 Embedding 逐步整合到目前已经的技术生态中，跟随社区一起成长！
+
+</details>
+
+## Contact
+
+您如果在使用过程中，遇到任何问题，欢迎前往[讨论区](https://huggingface.co/DMetaSoul/Dmeta-embedding/discussions)建言献策。
+
+您也可以联系我们：赵中昊 <zhongh@dmetasoul.com>, 肖文斌 <xiaowenbin@dmetasoul.com>, 孙凯 <xiaowenbin@dmetasoul.com>
+
+## License
+
+Dmeta-embedding 模型采用 Apache-2.0 License，开源模型可以进行免费商用私有部署。
