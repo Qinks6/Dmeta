@@ -1061,7 +1061,7 @@ model-index:
 
 ---
 
-# {Dmeta-embedding}
+# Dmeta-embedding
 
 
 <!--- Describe your model here -->
