@@ -1085,7 +1085,7 @@ Dmeta-embedding 是一款跨领域、跨任务、开箱即用的中文 Embedding
 - 模型参数大小仅 400MB，对比参数量超过 GB 级模型，可以极大降低推理成本
 - 支持上下文窗口长度达到 1024，对于长文本检索、RAG 等场景更适配
 
-## 用法
+## Usage
 
 目前模型支持通过 [Sentence-Transformers](#sentence-transformers), [Langchain](#langchain), [Huggingface Transformers](#huggingface-transformers) 等主流框架进行推理，具体用法参考各个框架的示例。
 
