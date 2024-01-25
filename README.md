@@ -355,7 +355,7 @@ model-index:
     - type: mrr_at_1000
       value: 89.529
     - type: mrr_at_3
-      value: 89.0
+      value: 89
     - type: mrr_at_5
       value: 89.297
     - type: ndcg_at_1
@@ -680,7 +680,7 @@ model-index:
     - type: recall_at_1
       value: 54.900000000000006
     - type: recall_at_10
-      value: 74.0
+      value: 74
     - type: recall_at_100
       value: 88.2
     - type: recall_at_1000
@@ -1037,7 +1037,7 @@ model-index:
     - type: recall_at_100
       value: 96.8
     - type: recall_at_1000
-      value: 99.0
+      value: 99
     - type: recall_at_3
       value: 76.5
     - type: recall_at_5
@@ -1057,8 +1057,10 @@ model-index:
       value: 69.17460264576461
     - type: f1
       value: 84.68032984659226
-
-
+license: apache-2.0
+language:
+- zh
+- en
 ---
 
 <div align="center">
