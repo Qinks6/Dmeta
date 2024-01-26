@@ -1,5 +1,5 @@
 {
-  "_name_or_path": "/home/zhongh/mix/OT_5-5",
+  "_name_or_path": "/DMetaSoul/Dmeta-embedding",
   "architectures": [
     "BertModel"
   ],
