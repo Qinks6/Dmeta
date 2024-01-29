@@ -1072,20 +1072,20 @@ language:
 <h4 align="center">
     <p>
         <a href=#usage>用法</a>  |
-        <a href="#evaluation">评测</a> |
+        <a href="#evaluation">评测（可复现）</a> |
         <a href=#faq>FAQ</a> |
         <a href="#contact">联系</a> |
         <a href="#license">版权（免费商用）</a> 
     <p>
 </h4>
 
-Dmeta-embedding 是一款跨领域、跨任务、开箱即用的中文 Embedding 模型，适用于搜索、问答、智能客服、LLM+RAG 等各种业务场景。
+Dmeta-embedding 是一款跨领域、跨任务、开箱即用的中文 Embedding 模型，适用于搜索、问答、智能客服、LLM+RAG 等各种业务场景，支持使用 Transformers/Sentence-Transformers/Langchain 等工具加载推理。
 
 优势特点如下：
 
-- 多任务、场景泛化性能优异，目前已取得 [MTEB](https://huggingface.co/spaces/mteb/leaderboard) 中文榜单第二成绩（2024.01.25）
-- 模型参数大小仅 400MB，对比参数量超过 GB 级模型，可以极大降低推理成本
-- 支持上下文窗口长度达到 1024，对于长文本检索、RAG 等场景更适配
+- 多任务、场景泛化性能优异，目前已取得 **[MTEB](https://huggingface.co/spaces/mteb/leaderboard) 中文榜单第二成绩**（2024.01.25）
+- 模型参数大小仅 **400MB**，对比参数量超过 GB 级模型，可以极大降低推理成本
+- 支持上下文窗口长度达到 **1024**，对于长文本检索、RAG 等场景更适配
 
 ## Usage
 
