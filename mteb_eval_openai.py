@@ -5,6 +5,12 @@ import hashlib
 import numpy as np
 import requests
 
+import logging
+import functools
+from mteb import MTEB
+from sentence_transformers import SentenceTransformer
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("main")
 
 OPENAI_BASE_URL = os.environ.get('OPENAI_BASE_URL', '')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
